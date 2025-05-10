@@ -11,10 +11,21 @@ Provides a consistent environment for Ansible operations
 ```
 # Dockerfile 
 
-RUN apk add --no-cache openssh-client bash
+RUN apk add --no-cache openssh-client
 ```
 
+### openssh-client
 
+**Purpose**: This package provides essential SSH client functionality for Ansible to connect to remote hosts.
+
+**How it's used**:
+
+Ansible uses SSH as its default connection method to remote machines
+The SSH client executables (ssh, scp, ssh-keygen, etc.) enable Ansible to:
+
+Without this package: Ansible would fail to establish SSH connections to remote hosts, which would prevent most playbooks from executing since they require remote access.
+
+---
 
 ### Implementation Questions
 

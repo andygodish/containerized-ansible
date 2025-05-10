@@ -7,8 +7,8 @@ ENV PATH="/home/nonroot/.local/bin:$PATH"
 # Switch to root for package installation
 USER root
 
-# Install necessary system packages
-RUN apk add --no-cache openssh-client bash
+# Install only necessary system packages
+RUN apk add --no-cache openssh-client
 
 # Create ansible directories with proper permissions
 RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
