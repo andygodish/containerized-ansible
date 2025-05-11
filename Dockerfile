@@ -1,5 +1,8 @@
 FROM cgr.dev/chainguard/python:latest-dev
 
+# Accept Ansible version as build argument, default to latest
+ARG ANSIBLE_VERSION=latest
+
 # Set environment variables
 ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
 ENV PATH="/home/nonroot/.local/bin:$PATH"
@@ -18,8 +21,14 @@ RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault 
 # Switch back to nonroot for remaining operations
 USER nonroot
 
-# Install Ansible with pip
-RUN pip install --user ansible
+# Install specified Ansible version with pip
+RUN if [ "${ANSIBLE_VERSION}" = "latest" ]; then \
+        pip install --user ansible; \
+    else \
+        # Remove 'v' prefix if present
+        VERSION=$(echo ${ANSIBLE_VERSION} | sed 's/^v//'); \
+        pip install --user ansible-core==${VERSION}; \
+    fi
 
 # Copy default ansible.cfg
 COPY --chown=nonroot:nonroot ansible.cfg /ansible/ansible.cfg
