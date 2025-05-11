@@ -2,11 +2,12 @@
   "packages": {
     ".": {
       "release-type": "simple",
-      "initial-version": "2.18.5-0",
       "prerelease": true,
       "versioning": "prerelease",
-      "prerelease-type": "build",
+      "prerelease-type": "",
       "include-component-in-tag": false,
+      "bump-minor-pre-major": true,
+      "bump-patch-for-minor-pre-major": true,
       "include-v-in-tag": true,
       "pull-request-title-pattern": "chore(release): ${version}",
       "changelog-sections": [
