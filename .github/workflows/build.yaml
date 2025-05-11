@@ -21,7 +21,7 @@ jobs:
         id: version
         run: |
           ANSIBLE_VERSION=$(jq -r '.["ansible-core"]' ansible-version.json)
-          echo "ANSIBLE_VERSION=$ANSIBLE_VERSION" >> $GITHUB_ENV
+          echo "version=$ANSIBLE_VERSION" >> $GITHUB_OUTPUT 
           echo "Extracted Ansible version: $ANSIBLE_VERSION"
 
       - name: Set up Docker Buildx
@@ -29,8 +29,8 @@ jobs:
 
       - name: Build container
         run: |
-          make build ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
+          make build ANSIBLE_VERSION=${{ steps.version.outputs.version }}
       
       - name: Test container
         run: |
-          make test ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
+          make test ANSIBLE_VERSION=${{ steps.version.outputs.version }}

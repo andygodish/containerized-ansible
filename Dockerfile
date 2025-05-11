@@ -31,7 +31,8 @@ RUN if [ "${ANSIBLE_VERSION}" = "latest" ]; then \
     fi
 
 # Final stage
-FROM --platform=$TARGETPLATFORM cgr.dev/chainguard/python:latest-dev
+# vscode-ignore-next-line
+FROM cgr.dev/chainguard/python:latest-dev
 
 # Accept Ansible version argument to pass to final image
 ARG ANSIBLE_VERSION

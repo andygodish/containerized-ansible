@@ -2,9 +2,9 @@
 
 Rather than maintaining dependencies in your local environment, use this purpose-built Ansible container that:
 
-Can be run with a single command
-Mounts local playbooks/inventory for execution
-Provides a consistent environment for Ansible operations
+- Can be run with a single command
+- Mounts local playbooks/inventory for execution
+- Provides a consistent environment for Ansible operations
 
 ## Quick Start
 
@@ -33,6 +33,15 @@ docker run --rm containerized-ansible:2.18.4 ansible --version
 ```
 
 this should return valid ansible output corresponding to the specified version.
+
+### Using Published Images
+
+This repository also publishes images to my [ghcr.io](https://github.com/andygodish/containerized-ansible/pkgs/container/containerized-ansible) registry. Pull an image from the remote registry like so:
+
+```
+docker pull ghcr.io/andygodish/containerized-ansible:latest
+```
+
 
 ## Necessary System Packages
 
@@ -77,13 +86,3 @@ docker run --rm \
 ```
 
 ---
-
-### Implementation Questions
-
-Generated from early converations with the team (ie, AI)
-
-1. Do you want to include any Ansible collections by default, or just the core?
-2. How do you plan to handle SSH authentication? (Mounting keys, agent forwarding)
-3. Will you need to support Ansible Vault operations?
-4. Any specific version requirements for Ansible?
-5. Any specific plugins or dependencies your playbooks typically require?
