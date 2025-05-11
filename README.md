@@ -25,6 +25,29 @@ The SSH client executables (ssh, scp, ssh-keygen, etc.) enable Ansible to:
 
 Without this package: Ansible would fail to establish SSH connections to remote hosts, which would prevent most playbooks from executing since they require remote access.
 
+## Volume Mounting
+
+```
+# Dockerfile
+
+RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
+    /ansible/roles /ansible/collections \
+    && chown -R nonroot:nonroot /ansible
+```
+
+The `nonroot` user is only given adequate permissions to the `/ansible` directory. You will need to mount your local playbooks, inventory, and any other necessary files into the container at runtime. For example:
+
+```
+docker run --rm \
+  -v $(pwd)/playbooks:/ansible/playbooks \
+  -v $(pwd)/inventory.yaml:/ansible/inventory/inventory.yaml \
+  -v $(pwd)/roles:/ansible/roles \
+  -v $(pwd)/collections:/ansible/collections \
+  -v ~/.ssh:/home/nonroot/.ssh \
+  containerized-ansible \
+  ansible-playbook /ansible/playbooks/your-playbook.yml -i /ansible/inventory/inventory.yaml
+```
+
 ---
 
 ### Implementation Questions

@@ -10,8 +10,9 @@ USER root
 # Install only necessary system packages
 RUN apk add --no-cache openssh-client
 
-# Create ansible directories with proper permissions
+# Create all ansible directories with proper permissions
 RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
+    /ansible/roles /ansible/collections \
     && chown -R nonroot:nonroot /ansible
 
 # Switch back to nonroot for remaining operations
