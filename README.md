@@ -6,6 +6,34 @@ Can be run with a single command
 Mounts local playbooks/inventory for execution
 Provides a consistent environment for Ansible operations
 
+## Quick Start
+
+### Prerequisites
+
+1. Docker
+
+Utilize the makefile to build the latest version (as indicated by the `ansible-version.json` file in the root of this repository):
+
+```
+make build 
+```
+
+To download a specific version of Ansible: 
+
+```
+make build ANSIBLE_VERSION=2.18.4
+```
+
+This will result in a local image called `containerized-ansible` with an image tag corresponding to the version of Ansible you specified. If a version was not specified, then the tag will correspond to the version found in the `ansible-version.json` file.
+
+### Verify the Image
+
+```
+docker run --rm containerized-ansible:2.18.4 ansible --version
+```
+
+this should return valid ansible output corresponding to the specified version.
+
 ## Necessary System Packages
 
 ```
