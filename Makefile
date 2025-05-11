@@ -1,5 +1,5 @@
 # Variables
-ANSIBLE_VERSION ?= 
+ANSIBLE_VERSION ?= $(shell jq -r '.["ansible-core"]' ansible-version.json 2>/dev/null || echo "")
 IMAGE_NAME := containerized-ansible
 REPO_ROOT := $(shell pwd)
 

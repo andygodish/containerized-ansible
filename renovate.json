@@ -1,0 +1,24 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["ansible-core"],
+      "groupName": "ansible-core",
+      "automerge": false
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": ["^ansible-version\\.json$"],
+      "matchStrings": [
+        "\"ansible-core\": \"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "pypi",
+      "depNameTemplate": "ansible-core",
+      "versioningTemplate": "semver"
+    }
+  ]
+}

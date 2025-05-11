@@ -1,0 +1,36 @@
+name: Build Ansible Container
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'ansible-version.json'
+      - 'Dockerfile'
+      - 'Makefile'
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Extract Ansible version
+        id: version
+        run: |
+          ANSIBLE_VERSION=$(jq -r '.["ansible-core"]' ansible-version.json)
+          echo "ANSIBLE_VERSION=$ANSIBLE_VERSION" >> $GITHUB_ENV
+          echo "Extracted Ansible version: $ANSIBLE_VERSION"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build container
+        run: |
+          make build ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
+      
+      - name: Test container
+        run: |
+          make test ANSIBLE_VERSION=${{ env.ANSIBLE_VERSION }}
