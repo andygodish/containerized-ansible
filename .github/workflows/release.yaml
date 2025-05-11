@@ -8,48 +8,80 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  packages: write
+  issues: write
 
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      ansible_version: ${{ steps.extract-ansible.outputs.ansible_version }}
     steps:
-      - uses: google-github-actions/release-please-action@v4
+      - uses: google-github-actions/release-please-action@v3
         id: release
         with:
           release-type: simple
+          command: manifest
           token: ${{ secrets.GITHUB_TOKEN }}
-          config-file: release-please-config.json
-          manifest-file: .release-please-manifest.json
       
-      # Only run the following if a release was created
       - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
         
-      - name: Extract version from release
+      - name: Extract ansible-core version
         if: ${{ steps.release.outputs.release_created }}
-        id: version
+        id: extract-ansible
         run: |
-          VERSION=${{ steps.release.outputs.tag_name }}
-          # Remove 'v' prefix if present
-          VERSION=${VERSION#v}
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-          echo "Released version: $VERSION"
+          ANSIBLE_VERSION=$(jq -r '.["ansible-core"]' ansible-version.json)
+          echo "ansible_version=$ANSIBLE_VERSION" >> $GITHUB_OUTPUT
+          echo "Found ansible-core version: $ANSIBLE_VERSION"
+
+  build-and-push:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       
       - name: Set up Docker Buildx
-        if: ${{ steps.release.outputs.release_created }}
-        uses: docker/setup-buildx-action@v2
-        
-      - name: Build and push container
-        if: ${{ steps.release.outputs.release_created }}
+        uses: docker/setup-buildx-action@v3
+      
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
+      
+      - name: Extract version without v prefix
+        id: version
         run: |
-          # Extract the ansible-core version (without the build suffix)
-          ANSIBLE_VERSION=$(echo $VERSION | sed -E 's/^(.*)-[0-9]+$/\1/')
+          VERSION="${{ needs.release-please.outputs.tag_name }}"
+          # Remove 'v' prefix if present
+          VERSION=${VERSION#v}
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
           
-          # Build the container with the ansible version
-          make build ANSIBLE_VERSION=$ANSIBLE_VERSION
+          # Extract the base version (without build number)
+          BASE_VERSION=$(echo $VERSION | sed -E 's/^(.*)-[0-9]+$/\1/')
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
           
-          # Tag with the full version including build number
-          docker tag containerized-ansible:$ANSIBLE_VERSION containerized-ansible:$VERSION
-          
-          # Push the container if needed
-          # docker push containerized-ansible:$VERSION
+          echo "Full version: $VERSION"
+          echo "Ansible core version: $BASE_VERSION"
+      
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: true
+          build-args: |
+            ANSIBLE_VERSION=${{ needs.release-please.outputs.ansible_version }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/containerized-ansible:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/containerized-ansible:${{ steps.version.outputs.base_version }}
+            ghcr.io/${{ github.repository_owner }}/containerized-ansible:latest

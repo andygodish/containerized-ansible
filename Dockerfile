@@ -1,22 +1,13 @@
-FROM cgr.dev/chainguard/python:latest-dev
+FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/python:latest-dev AS builder
 
 # Accept Ansible version as build argument, default to latest
 ARG ANSIBLE_VERSION=latest
-
-# Set environment variables
-ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
-ENV PATH="/home/nonroot/.local/bin:$PATH"
-
-# Switch to root for package installation
-USER root
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
 
 # Install only necessary system packages
+USER root
 RUN apk add --no-cache openssh-client
-
-# Create all ansible directories with proper permissions
-RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
-    /ansible/roles /ansible/collections \
-    && chown -R nonroot:nonroot /ansible
 
 # Switch back to nonroot for remaining operations
 USER nonroot
@@ -27,8 +18,41 @@ RUN if [ "${ANSIBLE_VERSION}" = "latest" ]; then \
     else \
         # Remove 'v' prefix if present
         VERSION=$(echo ${ANSIBLE_VERSION} | sed 's/^v//'); \
-        pip install --user ansible-core==${VERSION}; \
+        # Check if installing a pre-2.10 version (when ansible-core didn't exist)
+        MAJOR=$(echo ${VERSION} | cut -d. -f1); \
+        MINOR=$(echo ${VERSION} | cut -d. -f2); \
+        if [ "$MAJOR" -lt 2 ] || ([ "$MAJOR" -eq 2 ] && [ "$MINOR" -lt 10 ]); then \
+            # For older versions, install ansible directly
+            pip install --user ansible==${VERSION}; \
+        else \
+            # For 2.10+, install ansible-core with specific version
+            pip install --user ansible-core==${VERSION}; \
+        fi \
     fi
+
+# Final stage
+FROM --platform=$TARGETPLATFORM cgr.dev/chainguard/python:latest-dev
+
+# Accept Ansible version argument to pass to final image
+ARG ANSIBLE_VERSION
+
+# Set environment variables
+ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
+ENV PATH="/home/nonroot/.local/bin:$PATH"
+
+# Install only necessary system packages
+USER root
+RUN apk add --no-cache openssh-client
+
+# Create all ansible directories with proper permissions
+RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
+    /ansible/roles /ansible/collections \
+    && chown -R nonroot:nonroot /ansible
+
+USER nonroot
+
+# Copy Ansible installation from builder
+COPY --from=builder --chown=nonroot:nonroot /home/nonroot/.local /home/nonroot/.local
 
 # Copy default ansible.cfg
 COPY --chown=nonroot:nonroot ansible.cfg /ansible/ansible.cfg
@@ -39,5 +63,9 @@ RUN chmod +x /home/nonroot/entrypoint.sh
 
 # Set working directory
 WORKDIR /ansible
+
+# Set label for version tracking
+LABEL org.opencontainers.image.description="Containerized Ansible ${ANSIBLE_VERSION}"
+LABEL org.opencontainers.image.version="${ANSIBLE_VERSION}"
 
 ENTRYPOINT ["/home/nonroot/entrypoint.sh"]

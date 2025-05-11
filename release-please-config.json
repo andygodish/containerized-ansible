@@ -4,13 +4,6 @@
       "release-type": "simple",
       "initial-version": "2.18.5-0",
       "prerelease": true,
-      "extra-files": [
-        {
-          "type": "json",
-          "path": "ansible-version.json",
-          "jsonpath": "$.\"ansible-core\""
-        }
-      ],
       "versioning": "prerelease",
       "prerelease-type": "build",
       "include-component-in-tag": false,
