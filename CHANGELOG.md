@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.6-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-0...v2.18.6-0) (2025-05-11)
+
+
+### Miscellaneous
+
+* release please config changes ([c0ce8ba](https://github.com/andygodish/containerized-ansible/commit/c0ce8bae315de8b4ad04d982afc7978709fa5375))
+* removed base image version push in release ci yaml ([c4e346e](https://github.com/andygodish/containerized-ansible/commit/c4e346e83dfd1ee1bf077f7c9bc73aa2a5c222bb))
+
 ## [2.18.5-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-0...v2.18.5-0) (2025-05-11)
 
 
