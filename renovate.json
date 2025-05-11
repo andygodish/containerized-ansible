@@ -8,6 +8,14 @@
       "matchPackagePatterns": ["ansible-core"],
       "groupName": "ansible-core",
       "automerge": false
+    },
+    {
+      "matchPackagePatterns": ["^actions/", "^docker/", "^google-github-actions/"],
+      "matchDepTypes": ["action"],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions",
+      "commitMessageTopic": "GitHub Actions dependencies",
+      "commitMessagePrefix": "chore(deps):"
     }
   ],
   "regexManagers": [
