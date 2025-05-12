@@ -23,10 +23,10 @@ RUN if [ "${ANSIBLE_VERSION}" = "latest" ]; then \
         MINOR=$(echo ${VERSION} | cut -d. -f2); \
         if [ "$MAJOR" -lt 2 ] || ([ "$MAJOR" -eq 2 ] && [ "$MINOR" -lt 10 ]); then \
             # For older versions, install ansible directly
-            pip install --user ansible==${VERSION};\
+            pip install --user ansible==${VERSION} ansible-lint; \
         else \
             # For 2.10+, install ansible-core with specific version
-            pip install --user ansible-core==${VERSION}; ansible-lint\
+            pip install --user ansible-core==${VERSION} ansible-lint; \
         fi \
     fi
 
