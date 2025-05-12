@@ -5,6 +5,14 @@
 
 ### Miscellaneous
 
+* **release:** 2.18.5-1 ([#16](https://github.com/andygodish/containerized-ansible/issues/16)) ([a9286ec](https://github.com/andygodish/containerized-ansible/commit/a9286ec626631ba5dd1a1d37cbac9ca7a87f83ec))
+* trigger release-please ([152858c](https://github.com/andygodish/containerized-ansible/commit/152858ce464ed1b7b7a9a362674a6a40f369ffce))
+
+## [2.18.5-1](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-1...v2.18.5-1) (2025-05-12)
+
+
+### Miscellaneous
+
 * trigger release-please ([152858c](https://github.com/andygodish/containerized-ansible/commit/152858ce464ed1b7b7a9a362674a6a40f369ffce))
 
 ## [2.18.5-1](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-0...v2.18.5-1) (2025-05-12)
