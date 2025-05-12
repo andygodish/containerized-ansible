@@ -1,5 +1,22 @@
 # Changelog
 
+## [2.18.5-2](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-1...v2.18.5-2) (2025-05-12)
+
+
+### Features
+
+* added second collections location, installed community collection by default ontop of core ([e066244](https://github.com/andygodish/containerized-ansible/commit/e0662446897ed5322519af2b73753f9e9615d49d))
+
+
+### Miscellaneous
+
+* trigger release-please ([1ad6fc1](https://github.com/andygodish/containerized-ansible/commit/1ad6fc14f5e15a36e6b66c5965030f9eb4318063))
+
+
+### Documentation
+
+* cleaned up changelog ([f3337cc](https://github.com/andygodish/containerized-ansible/commit/f3337ccce10ef35cbc4dabaab3525c0f7bc71ac1))
+
 ## [2.18.5-1](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-1...v2.18.5-1) (2025-05-12)
 
 
