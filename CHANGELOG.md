@@ -11,9 +11,6 @@
 ### Miscellaneous
 
 * **deps:** Update github-actions ([e52640d](https://github.com/andygodish/containerized-ansible/commit/e52640df9838fe3e9200ef987758271a3fbb9222))
-* release please config changes ([5e1c498](https://github.com/andygodish/containerized-ansible/commit/5e1c4985100aa5c5359f6891e708883190638bf9))
-* release please config changes ([8cc2fed](https://github.com/andygodish/containerized-ansible/commit/8cc2fed83fa51c677bffeec2effa6ad8e5df295c))
-* release please config changes ([792aad5](https://github.com/andygodish/containerized-ansible/commit/792aad5ced875d29ff0495c24fa6510ef28575a4))
 * release please config changes ([c0ce8ba](https://github.com/andygodish/containerized-ansible/commit/c0ce8bae315de8b4ad04d982afc7978709fa5375))
 * removed base image version push in release ci yaml ([c4e346e](https://github.com/andygodish/containerized-ansible/commit/c4e346e83dfd1ee1bf077f7c9bc73aa2a5c222bb))
 * removed version.txt file ([66f9b62](https://github.com/andygodish/containerized-ansible/commit/66f9b62c9cbc877d21c93e09edb855127a0e560b))
