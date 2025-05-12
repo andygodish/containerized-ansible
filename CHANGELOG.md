@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.18.5-1](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-0...v2.18.5-1) (2025-05-12)
+
+
+### Features
+
+* added ansible-lint to image ([55d7270](https://github.com/andygodish/containerized-ansible/commit/55d727062ca71d30b4ae7a7aad90c0c7d7691fc8))
+
+
+### Miscellaneous
+
+* **deps:** Update github-actions ([e52640d](https://github.com/andygodish/containerized-ansible/commit/e52640df9838fe3e9200ef987758271a3fbb9222))
+* release please config changes ([c0ce8ba](https://github.com/andygodish/containerized-ansible/commit/c0ce8bae315de8b4ad04d982afc7978709fa5375))
+* removed base image version push in release ci yaml ([c4e346e](https://github.com/andygodish/containerized-ansible/commit/c4e346e83dfd1ee1bf077f7c9bc73aa2a5c222bb))
+* removed version.txt file ([66f9b62](https://github.com/andygodish/containerized-ansible/commit/66f9b62c9cbc877d21c93e09edb855127a0e560b))
+* trigger release-please ([d4e0460](https://github.com/andygodish/containerized-ansible/commit/d4e046073bcfcb4e286ef988d4c9107c63797574))
+
+
+### Documentation
+
+* typos/refactor ([ca1bdd0](https://github.com/andygodish/containerized-ansible/commit/ca1bdd0e8198ac46cdb4ef12cba30a5dc62b6d4c))
+
 ## [2.18.5-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-0...v2.18.5-0) (2025-05-11)
 
 
