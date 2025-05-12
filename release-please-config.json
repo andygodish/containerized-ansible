@@ -3,8 +3,10 @@
     ".": {
       "release-type": "simple",
       "prerelease": true,
+      "prerelease-type": "",
+      "draft": false,
       "versioning": "prerelease",
-      "include-component-in-tag": false,
+      "include-component-in-tag": false,  
       "include-v-in-tag": true,
       "pull-request-title-pattern": "chore(release): ${version}",
       "changelog-sections": [
