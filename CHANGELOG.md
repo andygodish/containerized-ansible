@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.6-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-2...v2.18.6-0) (2025-05-20)
+
+
+### Miscellaneous
+
+* **deps:** update dependency ansible-core to v2.18.6 ([#20](https://github.com/andygodish/containerized-ansible/issues/20)) ([b7776dd](https://github.com/andygodish/containerized-ansible/commit/b7776dd7035bf1303bbf7637293907af10b94a90))
+* trigger release-please ([5f2cd08](https://github.com/andygodish/containerized-ansible/commit/5f2cd0848ffc0a4804e1f703d2fb87a178b580d0))
+
 ## [2.18.5-2](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-1...v2.18.5-2) (2025-05-12)
 
 
