@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.18.6-1](https://github.com/andygodish/containerized-ansible/compare/v2.18.6-0...v2.18.6-1) (2025-07-04)
+
+
+### Miscellaneous
+
+* **config:** migrate config renovate.json ([#22](https://github.com/andygodish/containerized-ansible/issues/22)) ([dc5017e](https://github.com/andygodish/containerized-ansible/commit/dc5017e998b39dc52a7e80100848431c9e123323))
+* updated default config ([#24](https://github.com/andygodish/containerized-ansible/issues/24)) ([444679a](https://github.com/andygodish/containerized-ansible/commit/444679ad004fb52b9a6edc4491643f6d847b05b6))
+
 ## [2.18.6-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.5-2...v2.18.6-0) (2025-05-20)
 
 
