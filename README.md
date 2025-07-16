@@ -86,3 +86,15 @@ docker run --rm \
 ```
 
 ---
+
+## Convenience Functions
+
+To make working with containerized Ansible easier, source the provided aliases:
+
+```bash
+# Use default version (2.18.7)
+source ./aliases.sh
+
+# Or specify a version
+export ANSIBLE_VERSION=2.17.0
+source ./aliases.sh

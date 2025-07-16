@@ -38,6 +38,18 @@
       "datasourceTemplate": "pypi",
       "depNameTemplate": "ansible-core",
       "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": [
+        "/^aliases\\.sh$/"
+      ],
+      "matchStrings": [
+        "ANSIBLE_VERSION=\\$\\{ANSIBLE_VERSION:-(?<currentValue>[^}]+)\\}"
+      ],
+      "datasourceTemplate": "pypi",
+      "depNameTemplate": "ansible-core",
+      "versioningTemplate": "semver"
     }
   ]
 }
