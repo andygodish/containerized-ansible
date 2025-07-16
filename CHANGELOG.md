@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.18.7-0](https://github.com/andygodish/containerized-ansible/compare/v2.18.6-2...v2.18.7-0) (2025-07-16)
+
+
+### Miscellaneous
+
+* trigger release-please ([007be64](https://github.com/andygodish/containerized-ansible/commit/007be645b842b531f5c74fabb01fa68145f68b2b))
+
 ## [2.18.6-2](https://github.com/andygodish/containerized-ansible/compare/v2.18.6-1...v2.18.6-2) (2025-07-16)
 
 
