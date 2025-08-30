@@ -7,7 +7,7 @@
 # export ANSIBLE_VERSION=2.17.0
 # source ./aliases.sh
 
-ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.18.7}
+ANSIBLE_VERSION=${ANSIBLE_VERSION:-2.19.1}
 
 ansible-role-init() {
     if [ -z "$1" ]; then
