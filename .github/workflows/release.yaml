@@ -19,7 +19,7 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
       ansible_version: ${{ steps.extract-ansible.outputs.ansible_version }}
     steps:
-      - uses: google-github-actions/release-please-action@v4
+      - uses: googleapis/release-please-action@v4
         id: release
       - uses: actions/checkout@v5
         if: ${{ steps.release.outputs.release_created }}
