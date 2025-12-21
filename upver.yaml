@@ -1,0 +1,12 @@
+version:
+  file: .release-please-manifest.json
+  pattern: '"\.":\s*"([^"]+)"'
+  group: 1
+
+upstream:
+  file: ansible-version.json
+  pattern: '"ansible-core":\s*"([^"]+)"'
+  group: 1
+
+changelog:
+  file: CHANGELOG.md

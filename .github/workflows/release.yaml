@@ -1,4 +1,4 @@
-name: Release Please
+name: Release (upver)
 
 on:
   push:
@@ -9,65 +9,77 @@ permissions:
   contents: write
   pull-requests: write
   packages: write
-  issues: write
 
 jobs:
-  release-please:
+  bump-and-pr:
     runs-on: ubuntu-latest
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }}
-      tag_name: ${{ steps.release.outputs.tag_name }}
-      ansible_version: ${{ steps.extract-ansible.outputs.ansible_version }}
     steps:
-      - uses: google-github-actions/release-please-action@v4
-        id: release
-      - uses: actions/checkout@v5
-        if: ${{ steps.release.outputs.release_created }}
-        
-      - name: Extract ansible-core version
-        if: ${{ steps.release.outputs.release_created }}
-        id: extract-ansible
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Install upver
         run: |
-          ANSIBLE_VERSION=$(jq -r '.["ansible-core"]' ansible-version.json)
-          echo "ansible_version=$ANSIBLE_VERSION" >> $GITHUB_OUTPUT
-          echo "Found ansible-core version: $ANSIBLE_VERSION"
+          curl -fsSL -o /usr/local/bin/upver \
+            https://github.com/andygodish/upver/releases/download/v0.0.2/upver-linux-amd64
+          chmod +x /usr/local/bin/upver
+          upver --help >/dev/null || true
+
+      - name: Run upver (apply + changelog)
+        run: |
+          upver --apply --changelog
+
+      - name: Create/Update release PR
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: release/upver
+          title: "chore(release): update manifest + changelog"
+          commit-message: "chore(release): update manifest + changelog"
+          body: |
+            Automated version bump + changelog update via upver.
+          labels: |
+            release
+          add-paths: |
+            .release-please-manifest.json
+            CHANGELOG.md
 
   build-and-push:
-    needs: release-please
-    if: ${{ needs.release-please.outputs.release_created == 'true' }}
+    needs: bump-and-pr
     runs-on: ubuntu-latest
+    # Only run when THIS push to main included the manifest change (i.e., the release PR merge)
+    if: contains(join(github.event.commits.*.modified, ' '), '.release-please-manifest.json') || contains(join(github.event.commits.*.added, ' '), '.release-please-manifest.json')
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v5
-      
+        with:
+          fetch-depth: 0
+
+      - name: Extract versions
+        id: versions
+        run: |
+          VERSION=$(jq -r '.["."]' .release-please-manifest.json)
+          ANSIBLE_VERSION=$(jq -r '.["ansible-core"]' ansible-version.json)
+
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "ansible_version=$ANSIBLE_VERSION" >> $GITHUB_OUTPUT
+
+          echo "Release version: $VERSION"
+          echo "Ansible-core version: $ANSIBLE_VERSION"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
-      
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-      
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GHCR_PAT }}
-      
-      - name: Extract version without v prefix
-        id: version
-        run: |
-          VERSION="${{ needs.release-please.outputs.tag_name }}"
-          # Remove 'v' prefix if present
-          VERSION=${VERSION#v}
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
-          # Extract the base version (without build number)
-          BASE_VERSION=$(echo $VERSION | sed -E 's/^(.*)-[0-9]+$/\1/')
-          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
-          
-          echo "Full version: $VERSION"
-          echo "Ansible core version: $BASE_VERSION"
-      
+
       - name: Build and push multi-arch image
         uses: docker/build-push-action@v6
         with:
@@ -75,7 +87,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           build-args: |
-            ANSIBLE_VERSION=${{ needs.release-please.outputs.ansible_version }}
+            ANSIBLE_VERSION=${{ steps.versions.outputs.ansible_version }}
           tags: |
-            ghcr.io/${{ github.repository_owner }}/containerized-ansible:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/containerized-ansible:${{ steps.versions.outputs.version }}
             ghcr.io/${{ github.repository_owner }}/containerized-ansible:latest
