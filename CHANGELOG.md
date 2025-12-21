@@ -1,3 +1,12 @@
+## 2.20.1-1 - 2025-12-21
+
+- [a6131ea](https://github.com/andygodish/containerized-ansible/-/commit/a6131ea78c5814dd4628a5e236b2f375b2baab0a) chore(release): update manifest + changelog (#36)
+- [c2e9036](https://github.com/andygodish/containerized-ansible/-/commit/c2e90361abccf7a0e71cc3a73ae6dcf8813df840) chore(deps): update peter-evans/create-pull-request action to v8 (#37)
+- [ec31f09](https://github.com/andygodish/containerized-ansible/-/commit/ec31f09a7d8a7b79d917c0bc4a39cd1760e8a5d6) ci: fixing permissions (#38)
+- [c1355f3](https://github.com/andygodish/containerized-ansible/-/commit/c1355f3f47f66f9b6ce11f6179d368ce58a1c0e9) chore(deps): Update GitHub Actions dependencies to v6 (#34)
+- [e1109e5](https://github.com/andygodish/containerized-ansible/-/commit/e1109e5560ece1d72abb6729fef54de4ee7b8267) chore(deps): update dependency ansible-core to v2.20.1 (#32)
+- [640830a](https://github.com/andygodish/containerized-ansible/-/commit/640830acbc04bb0e52a9e40ffd95b79682da1ace) Chore: configure upver (#35)
+
 ## 2.20.1-0 - 2025-12-21
 
 - [c2e9036](https://github.com/andygodish/containerized-ansible/-/commit/c2e90361abccf7a0e71cc3a73ae6dcf8813df840) chore(deps): update peter-evans/create-pull-request action to v8 (#37)
