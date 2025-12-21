@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Install upver
         run: |
@@ -33,11 +34,10 @@ jobs:
       - name: Create/Update release PR
         uses: peter-evans/create-pull-request@v6
         with:
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: release/upver
           title: "chore(release): update manifest + changelog"
           commit-message: "chore(release): update manifest + changelog"
-          body: |
-            Automated version bump + changelog update via upver.
           labels: |
             release
           add-paths: |
