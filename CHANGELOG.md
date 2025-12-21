@@ -2,8 +2,6 @@
 
 - [28e59b2](https://github.com/andygodish/containerized-ansible/-/commit/28e59b27a17f8bb0e0a28ff49f8baa6ea30b4fad) chore: fixed CHANGELOG
 
-# Changelog
-
 ## 2.20.1-3 - 2025-12-21
 
 - [19e83d7](https://github.com/andygodish/containerized-ansible/-/commit/19e83d7fdcf35f99c138b194ae84b5dff229ee1c) ci: classify job added
