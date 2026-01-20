@@ -14,13 +14,13 @@ Rather than maintaining dependencies in your local environment, use this purpose
 
 Utilize the makefile to build the latest version (as indicated by the `ansible-version.json` file in the root of this repository):
 
-```
+```bash
 make build 
 ```
 
-To download a specific version of Ansible: 
+To download a specific version of Ansible:
 
-```
+```bash
 make build ANSIBLE_VERSION=2.18.4
 ```
 
@@ -28,7 +28,7 @@ This will result in a local image called `containerized-ansible` with an image t
 
 ### Verify the Image
 
-```
+```bash
 docker run --rm containerized-ansible:2.18.4 ansible --version
 ```
 
@@ -38,14 +38,13 @@ this should return valid ansible output corresponding to the specified version.
 
 This repository also publishes images to my [ghcr.io](https://github.com/andygodish/containerized-ansible/pkgs/container/containerized-ansible) registry. Pull an image from the remote registry like so:
 
-```
+```bash
 docker pull ghcr.io/andygodish/containerized-ansible:latest
 ```
 
-
 ## Necessary System Packages
 
-```
+```bash
 # Dockerfile 
 
 RUN apk add --no-cache openssh-client
@@ -64,7 +63,7 @@ Without this package: Ansible would fail to establish SSH connections to remote 
 
 ## Volume Mounting
 
-```
+```bash
 # Dockerfile
 
 RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
@@ -74,7 +73,7 @@ RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault 
 
 The `nonroot` user is only given adequate permissions to the `/ansible` directory. You will need to mount your local playbooks, inventory, and any other necessary files into the container at runtime. For example:
 
-```
+```bash
 docker run --rm \
   -v $(pwd)/playbooks:/ansible/playbooks \
   -v $(pwd)/inventory.yaml:/ansible/inventory/inventory.yaml \
