@@ -1,3 +1,8 @@
+## 2.20.1-5 - 2026-01-21
+
+- [c522f98](https://github.com/andygodish/containerized-ansible/-/commit/c522f98f08a4d6da3d77d6c00c045a05cefd02f3) fix: updated default ansible.cfg
+- [33e7803](https://github.com/andygodish/containerized-ansible/-/commit/33e7803b6a9ab4927cf908cfe36c3b1dd416b761) docs: linting
+
 ## 2.20.1-4 - 2025-12-21
 
 - [28e59b2](https://github.com/andygodish/containerized-ansible/-/commit/28e59b27a17f8bb0e0a28ff49f8baa6ea30b4fad) chore: fixed CHANGELOG
