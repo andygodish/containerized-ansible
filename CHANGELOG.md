@@ -1,3 +1,7 @@
+## 2.20.1-6 - 2026-01-23
+
+- [79785d7](https://github.com/andygodish/containerized-ansible/-/commit/79785d70d5e08faa59b46e39819f12b51764bdda) feat: alias, script, dockerfile to include bootstrapping of ansible p… (#46)
+
 ## 2.20.1-5 - 2026-01-21
 
 - [c522f98](https://github.com/andygodish/containerized-ansible/-/commit/c522f98f08a4d6da3d77d6c00c045a05cefd02f3) fix: updated default ansible.cfg
