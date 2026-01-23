@@ -17,6 +17,14 @@ ansible-role-init() {
     docker run -it --rm -v $(pwd):/workspace -w /workspace containerized-ansible:${ANSIBLE_VERSION} ansible-galaxy role init "$1"
 }
 
+ansible-playbook-init() {
+    if [ -z "$1" ]; then
+        echo "Usage: ansible-playbook-init <project-directory>"
+        return 1
+    fi
+    docker run -it --rm -v $(pwd):/workspace -w /workspace containerized-ansible:${ANSIBLE_VERSION} /ansible/scripts/bootstrap-playbook.sh "$1"
+}
+
 # Show available functions
 ansible-help() {
     echo "Available containerized-ansible functions (using version ${ANSIBLE_VERSION}):"

@@ -1,14 +1,16 @@
 FROM --platform=$BUILDPLATFORM cgr.dev/chainguard/python:latest-dev AS builder
+
 # Accept Ansible version as build argument, default to latest
 ARG ANSIBLE_VERSION=latest
 ARG TARGETPLATFORM
 ARG BUILDPLATFORM
-# Install only necessary system packages
+
 USER root
-RUN apk add --no-cache openssh-client
+# RUN apk add --no-cache openssh-client
+
 # Create global collections directory with appropriate permissions
 RUN mkdir -p /usr/share/ansible/collections && chown -R nonroot:nonroot /usr/share/ansible
-# Switch back to nonroot for remaining operations
+
 USER nonroot
 
 # Set PATH to include .local/bin
@@ -34,24 +36,26 @@ RUN if [ "${ANSIBLE_VERSION}" = "latest" ]; then \
         fi \
     fi
 
-# Final stage
 FROM cgr.dev/chainguard/python:latest-dev
-# Accept Ansible version argument to pass to final image
+
 ARG ANSIBLE_VERSION
-# Set environment variables
+
 ENV ANSIBLE_CONFIG=/ansible/ansible.cfg
 ENV PATH="/home/nonroot/.local/bin:$PATH"
 ENV ANSIBLE_COLLECTIONS_PATH="/usr/share/ansible/collections:/ansible/collections"
 
-# Install only necessary system packages
 USER root
 RUN apk add --no-cache openssh-client
+
 # Create ansible directories
 RUN mkdir -p /ansible/playbooks /ansible/inventory /ansible/vars /ansible/vault \
     /ansible/roles /ansible/collections
 # Create global collections directory
 RUN mkdir -p /usr/share/ansible/collections
 # Set proper permissions
+
+COPY ./scripts /ansible/scripts
+
 RUN chown -R nonroot:nonroot /ansible /usr/share/ansible
 
 USER nonroot
