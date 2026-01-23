@@ -28,6 +28,7 @@ ansible-playbook-init() {
 # Show available functions
 ansible-help() {
     echo "Available containerized-ansible functions (using version ${ANSIBLE_VERSION}):"
-    echo "  ansible-role-init <role-name>     - Initialize a new Ansible role"
-    echo "  ansible-help                      - Show this help message"
+    echo "  ansible-role-init <role-name>           - Initialize a new Ansible role"
+    echo "  ansible-playbook-init <project-name>    - Initialize a new Ansible playbook project"
+    echo "  ansible-help                            - Show this help message"
 }

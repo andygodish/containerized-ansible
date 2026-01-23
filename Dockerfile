@@ -6,7 +6,6 @@ ARG TARGETPLATFORM
 ARG BUILDPLATFORM
 
 USER root
-# RUN apk add --no-cache openssh-client
 
 # Create global collections directory with appropriate permissions
 RUN mkdir -p /usr/share/ansible/collections && chown -R nonroot:nonroot /usr/share/ansible
