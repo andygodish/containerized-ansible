@@ -1,3 +1,7 @@
+## 2.20.2-0 - 2026-01-31
+
+- [cbb183b](https://github.com/andygodish/containerized-ansible/-/commit/cbb183b0493bf58829aa95efe9fafe3b17362247) chore(deps): update dependency ansible-core to v2.20.2 (#48)
+
 ## 2.20.1-6 - 2026-01-23
 
 - [79785d7](https://github.com/andygodish/containerized-ansible/-/commit/79785d70d5e08faa59b46e39819f12b51764bdda) feat: alias, script, dockerfile to include bootstrapping of ansible p… (#46)
