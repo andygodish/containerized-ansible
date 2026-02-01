@@ -1,3 +1,7 @@
+## 2.20.2-1 - 2026-02-01
+
+- [12faf5b](https://github.com/andygodish/containerized-ansible/-/commit/12faf5bc267a6e1f751fa41f408f6212a79bcdcd) Docs: running playbooks against macOS host via SSH (#50)
+
 ## 2.20.2-0 - 2026-01-31
 
 - [cbb183b](https://github.com/andygodish/containerized-ansible/-/commit/cbb183b0493bf58829aa95efe9fafe3b17362247) chore(deps): update dependency ansible-core to v2.20.2 (#48)
