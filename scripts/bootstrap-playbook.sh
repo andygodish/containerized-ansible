@@ -58,11 +58,11 @@ all:
       ansible_user: your_user
       ansible_connection: ssh
 
-    # macOS host (from inside Docker Desktop)
-    # mac:
-    #   ansible_host: host.docker.internal
-    #   ansible_user: your_user
-    #   ansible_connection: ssh
+    # macOS host (from inside Docker Desktop). Requires Remote Login enabled.
+    macos-local:
+      ansible_host: host.docker.internal
+      ansible_user: your_user
+      ansible_connection: ssh
 EOF
 
 # Create main playbook
