@@ -133,6 +133,50 @@ cat > "$PROJECT_DIR/playbooks/main.yaml" << 'EOF'
         - df.txt
 EOF
 
+# Create run-playbook.sh helper
+cat > "$PROJECT_DIR/run-playbook.sh" << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Runs the bootstrapped playbook (playbooks/main.yaml) using the containerized-ansible image.
+# Default target: macos-local (host.docker.internal)
+
+IMAGE=${IMAGE:-"containerized-ansible:2.20.2"}
+INVENTORY_HOSTS_LIMIT=${INVENTORY_HOSTS_LIMIT:-"macos-local"}
+PLAYBOOK=${PLAYBOOK:-"playbooks/main.yaml"}
+INVENTORY=${INVENTORY:-"inventory.yaml"}
+SSH_KEY=${SSH_KEY:-"$HOME/.ssh/id_ed25519"}
+
+if [[ ! -f "$SSH_KEY" ]]; then
+  echo "ERROR: SSH key not found at $SSH_KEY" >&2
+  echo "Set SSH_KEY=/path/to/key (or create one)" >&2
+  exit 1
+fi
+
+mkdir -p artifacts
+mkdir -p .ssh-container
+
+# Disable reading macOS-specific ~/.ssh/config (UseKeychain, etc.)
+# Avoid writing known_hosts inside the container.
+ANSIBLE_SSH_ARGS=${ANSIBLE_SSH_ARGS:-"-F /dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/nonroot/.ssh/id_ed25519 -o IdentitiesOnly=yes"}
+
+exec docker run --rm \
+  --entrypoint ansible-playbook \
+  -e ANSIBLE_SSH_ARGS="$ANSIBLE_SSH_ARGS" \
+  -v "$(pwd)/playbooks:/ansible/playbooks" \
+  -v "$(pwd)/$INVENTORY:/ansible/inventory/inventory.yaml:ro" \
+  -v "$(pwd)/ansible.cfg:/ansible/ansible.cfg:ro" \
+  -v "$(pwd)/roles:/ansible/roles" \
+  -v "$(pwd)/collections:/ansible/collections" \
+  -v "$(pwd)/artifacts:/ansible/artifacts" \
+  -v "$(pwd)/.ssh-container:/home/nonroot/.ssh" \
+  -v "$SSH_KEY:/home/nonroot/.ssh/id_ed25519:ro" \
+  "$IMAGE" \
+  "/ansible/$PLAYBOOK" -i /ansible/inventory/inventory.yaml --limit "$INVENTORY_HOSTS_LIMIT" "$@"
+EOF
+
+chmod +x "$PROJECT_DIR/run-playbook.sh"
+
 # Create README.md
 cat > "$PROJECT_DIR/README.md" << EOF
 # ${PROJECT_NAME}
@@ -145,6 +189,7 @@ Ansible playbook project for ${PROJECT_NAME}.
 ${PROJECT_DIR}/
 ├── ansible.cfg           # Ansible configuration
 ├── inventory.yaml        # Inventory file
+├── run-playbook.sh       # Helper to run via Docker
 ├── playbooks/           # Playbook files
 │   └── main.yaml        # Main playbook
 ├── roles/               # Custom roles
@@ -158,7 +203,27 @@ ${PROJECT_DIR}/
 
 ## Usage
 
-### Run the main playbook
+### Run the main playbook (recommended)
+
+Use the helper script so you don’t have to remember all the volume mounts:
+
+\`\`\`bash
+./run-playbook.sh
+\`\`\`
+
+Defaults:
+- Image: `containerized-ansible:2.20.2` (override with `IMAGE=...`)
+- Target host limit: `macos-local` (override with `INVENTORY_HOSTS_LIMIT=...`)
+- SSH key: `~/.ssh/id_ed25519` (override with `SSH_KEY=...`)
+
+Pass through any extra `ansible-playbook` args:
+
+\`\`\`bash
+./run-playbook.sh -vv
+./run-playbook.sh --check
+\`\`\`
+
+### Run the main playbook (manual)
 
 \`\`\`bash
 # Example: run from the container, connecting to targets over SSH.
@@ -174,9 +239,10 @@ docker run --rm \\
   -v \$(pwd)/roles:/ansible/roles \\
   -v \$(pwd)/collections:/ansible/collections \\
   -v \$(pwd)/artifacts:/ansible/artifacts \\
+  -v \$(pwd)/.ssh-container:/home/nonroot/.ssh \\
   -v ~/.ssh/id_ed25519:/home/nonroot/.ssh/id_ed25519:ro \\
   containerized-ansible:<tag> \\
-  /ansible/playbooks/main.yaml -i /ansible/inventory/inventory.yaml
+  /ansible/playbooks/main.yaml -i /ansible/inventory/inventory.yaml --limit macos-local
 \`\`\`
 
 ### Or use the alias (if configured)
