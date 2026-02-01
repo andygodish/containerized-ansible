@@ -23,20 +23,24 @@ fi
 echo "Creating Ansible playbook project: $PROJECT_DIR"
 
 # Create directory structure
-mkdir -p "$PROJECT_DIR"/{playbooks,inventory,roles,collections,vars,vault,group_vars,host_vars}
+mkdir -p "$PROJECT_DIR"/{playbooks,inventory,roles,collections,vars,vault,group_vars,host_vars,artifacts}
 
 # Create ansible.cfg
 cat > "$PROJECT_DIR/ansible.cfg" << 'EOF'
 [defaults]
 inventory=./inventory.yaml
 host_key_checking = False
-stdout_callback = yaml
+# community.general.yaml callback was removed; use builtin default with YAML formatting
+stdout_callback = default
+result_format = yaml
 bin_ansible_callbacks = False
-become = True
+become = False
 roles_path = ./roles
 collections_path = ./collections
 remote_tmp = $HOME/.ansible/tmp
 local_tmp  = $HOME/.ansible/tmp
+
+deprecation_warnings = False
 
 [ssh_connection]
 pipelining = True
@@ -44,35 +48,134 @@ control_path = /tmp/ansible-ssh-%%h-%%p-%%r
 EOF
 
 # Create inventory.yaml template
+# NOTE: when running playbooks from inside Docker on macOS, the host is reachable at host.docker.internal
 cat > "$PROJECT_DIR/inventory.yaml" << 'EOF'
 ---
 all:
-  children:
-    servers:
-      hosts:
-        example-host:
-          ansible_host: 192.168.1.100
-          ansible_user: your_user
-          ansible_connection: ssh
+  hosts:
+    example-host:
+      ansible_host: 192.168.1.100
+      ansible_user: your_user
+      ansible_connection: ssh
+
+    # macOS host (from inside Docker Desktop). Requires Remote Login enabled.
+    macos-local:
+      ansible_host: host.docker.internal
+      ansible_user: your_user
+      ansible_connection: ssh
 EOF
 
 # Create main playbook
+# Writes reports on the remote host and fetches them back to ./artifacts on the controller.
 cat > "$PROJECT_DIR/playbooks/main.yaml" << 'EOF'
 ---
-- name: Main Playbook
+- name: Smoke test + basic report
   hosts: all
-  become: true
   gather_facts: true
-  
+  become: false
+
+  vars:
+    artifacts_dir: "{{ playbook_dir }}/../artifacts"
+    remote_report_dir: "/tmp/ansible-artifacts"
+
+  pre_tasks:
+    - name: Ensure remote report directory exists
+      ansible.builtin.file:
+        path: "{{ remote_report_dir }}"
+        state: directory
+        mode: "0755"
+
   tasks:
-    - name: Example task - Gather system facts
-      debug:
-        msg: |
-          Hostname: {{ ansible_hostname }}
-          OS: {{ ansible_distribution }} {{ ansible_distribution_version }}
-          Architecture: {{ ansible_architecture }}
-          Python version: {{ ansible_python_version }}
+    - name: Sanity check - ping
+      ansible.builtin.ping:
+
+    - name: Show a short summary
+      ansible.builtin.debug:
+        msg:
+          hostname: "{{ ansible_hostname }}"
+          os: "{{ ansible_distribution }} {{ ansible_distribution_version }}"
+          arch: "{{ ansible_architecture }}"
+          python: "{{ ansible_python_version | default('unknown') }}"
+
+    - name: Write facts report on remote
+      ansible.builtin.copy:
+        dest: "{{ remote_report_dir }}/report.yaml"
+        mode: "0644"
+        content: |
+          generated_at: {{ ansible_date_time.iso8601 }}
+          host:
+            hostname: {{ ansible_hostname }}
+            fqdn: {{ ansible_fqdn }}
+            user_id: {{ ansible_user_id }}
+          os:
+            distribution: {{ ansible_distribution }}
+            version: {{ ansible_distribution_version }}
+            kernel: {{ ansible_kernel }}
+
+    - name: Disk usage (human readable)
+      ansible.builtin.command: df -h
+      register: df_out
+      changed_when: false
+
+    - name: Write disk usage on remote
+      ansible.builtin.copy:
+        dest: "{{ remote_report_dir }}/df.txt"
+        mode: "0644"
+        content: "{{ df_out.stdout }}\n"
+
+    - name: Fetch reports back to controller artifacts/
+      ansible.builtin.fetch:
+        src: "{{ remote_report_dir }}/{{ item }}"
+        dest: "{{ artifacts_dir }}/"
+        flat: true
+      loop:
+        - report.yaml
+        - df.txt
 EOF
+
+# Create run-playbook.sh helper
+cat > "$PROJECT_DIR/run-playbook.sh" << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Runs the bootstrapped playbook (playbooks/main.yaml) using the containerized-ansible image.
+# Default target: macos-local (host.docker.internal)
+
+IMAGE=${IMAGE:-"containerized-ansible:2.20.2"}
+INVENTORY_HOSTS_LIMIT=${INVENTORY_HOSTS_LIMIT:-"macos-local"}
+PLAYBOOK=${PLAYBOOK:-"playbooks/main.yaml"}
+INVENTORY=${INVENTORY:-"inventory.yaml"}
+SSH_KEY=${SSH_KEY:-"$HOME/.ssh/id_ed25519"}
+
+if [[ ! -f "$SSH_KEY" ]]; then
+  echo "ERROR: SSH key not found at $SSH_KEY" >&2
+  echo "Set SSH_KEY=/path/to/key (or create one)" >&2
+  exit 1
+fi
+
+mkdir -p artifacts
+mkdir -p .ssh-container
+
+# Disable reading macOS-specific ~/.ssh/config (UseKeychain, etc.)
+# Avoid writing known_hosts inside the container.
+ANSIBLE_SSH_ARGS=${ANSIBLE_SSH_ARGS:-"-F /dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/nonroot/.ssh/id_ed25519 -o IdentitiesOnly=yes"}
+
+exec docker run --rm -it \
+  --entrypoint ansible-playbook \
+  -e ANSIBLE_SSH_ARGS="$ANSIBLE_SSH_ARGS" \
+  -v "$(pwd)/playbooks:/ansible/playbooks" \
+  -v "$(pwd)/$INVENTORY:/ansible/inventory/inventory.yaml:ro" \
+  -v "$(pwd)/ansible.cfg:/ansible/ansible.cfg:ro" \
+  -v "$(pwd)/roles:/ansible/roles" \
+  -v "$(pwd)/collections:/ansible/collections" \
+  -v "$(pwd)/artifacts:/ansible/artifacts" \
+  -v "$(pwd)/.ssh-container:/home/nonroot/.ssh" \
+  -v "$SSH_KEY:/home/nonroot/.ssh/id_ed25519:ro" \
+  "$IMAGE" \
+  "/ansible/$PLAYBOOK" -i /ansible/inventory/inventory.yaml --limit "$INVENTORY_HOSTS_LIMIT" "$@"
+EOF
+
+chmod +x "$PROJECT_DIR/run-playbook.sh"
 
 # Create README.md
 cat > "$PROJECT_DIR/README.md" << EOF
@@ -86,30 +189,66 @@ Ansible playbook project for ${PROJECT_NAME}.
 ${PROJECT_DIR}/
 ├── ansible.cfg           # Ansible configuration
 ├── inventory.yaml        # Inventory file
+├── run-playbook.sh       # Helper to run via Docker
 ├── playbooks/           # Playbook files
 │   └── main.yaml        # Main playbook
 ├── roles/               # Custom roles
 ├── collections/         # Custom collections
 ├── vars/                # Variable files
 ├── vault/               # Encrypted files
+├── artifacts/           # Output artifacts fetched from targets
 ├── group_vars/          # Group-specific variables
 └── host_vars/           # Host-specific variables
 \`\`\`
 
 ## Usage
 
-### Run the main playbook
+### Run the main playbook (recommended)
+
+Use the helper script so you don’t have to remember all the volume mounts:
 
 \`\`\`bash
+./run-playbook.sh
+\`\`\`
+
+Defaults:
+- Image: `containerized-ansible:2.20.2` (override with `IMAGE=...`)
+- Target host limit: `macos-local` (override with `INVENTORY_HOSTS_LIMIT=...`)
+- SSH key: `~/.ssh/id_ed25519` (override with `SSH_KEY=...`)
+
+Before first run (macOS host target):
+1. Edit `inventory.yaml` and set `macos-local.ansible_user` to your macOS username.
+2. Ensure your SSH public key is authorized for that user:
+   - Add it to `~/.ssh/authorized_keys` on the Mac
+   - Enable **Remote Login** (System Settings → General → Sharing → Remote Login)
+
+Pass through any extra `ansible-playbook` args:
+
+\`\`\`bash
+./run-playbook.sh -vv
+./run-playbook.sh --check
+\`\`\`
+
+### Run the main playbook (manual)
+
+\`\`\`bash
+# Example: run from the container, connecting to targets over SSH.
+# NOTE: If you want to target the *macOS host* from the container, use host.docker.internal in inventory.yaml.
+mkdir -p artifacts
+
 docker run --rm \\
+  --entrypoint ansible-playbook \\
+  -e ANSIBLE_SSH_ARGS='-F /dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/nonroot/.ssh/id_ed25519 -o IdentitiesOnly=yes' \\
   -v \$(pwd)/playbooks:/ansible/playbooks \\
-  -v \$(pwd)/inventory.yaml:/ansible/inventory/inventory.yaml \\
-  -v \$(pwd)/ansible.cfg:/ansible/ansible.cfg \\
+  -v \$(pwd)/inventory.yaml:/ansible/inventory/inventory.yaml:ro \\
+  -v \$(pwd)/ansible.cfg:/ansible/ansible.cfg:ro \\
   -v \$(pwd)/roles:/ansible/roles \\
   -v \$(pwd)/collections:/ansible/collections \\
-  -v ~/.ssh:/home/nonroot/.ssh \\
-  containerized-ansible:2.20.1 \\
-  ansible-playbook /ansible/playbooks/main.yaml -i /ansible/inventory/inventory.yaml
+  -v \$(pwd)/artifacts:/ansible/artifacts \\
+  -v \$(pwd)/.ssh-container:/home/nonroot/.ssh \\
+  -v ~/.ssh/id_ed25519:/home/nonroot/.ssh/id_ed25519:ro \\
+  containerized-ansible:<tag> \\
+  /ansible/playbooks/main.yaml -i /ansible/inventory/inventory.yaml --limit macos-local
 \`\`\`
 
 ### Or use the alias (if configured)
