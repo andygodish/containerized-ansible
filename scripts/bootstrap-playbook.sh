@@ -160,7 +160,7 @@ mkdir -p .ssh-container
 # Avoid writing known_hosts inside the container.
 ANSIBLE_SSH_ARGS=${ANSIBLE_SSH_ARGS:-"-F /dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/nonroot/.ssh/id_ed25519 -o IdentitiesOnly=yes"}
 
-exec docker run --rm \
+exec docker run --rm -it \
   --entrypoint ansible-playbook \
   -e ANSIBLE_SSH_ARGS="$ANSIBLE_SSH_ARGS" \
   -v "$(pwd)/playbooks:/ansible/playbooks" \
