@@ -216,6 +216,12 @@ Defaults:
 - Target host limit: `macos-local` (override with `INVENTORY_HOSTS_LIMIT=...`)
 - SSH key: `~/.ssh/id_ed25519` (override with `SSH_KEY=...`)
 
+Before first run (macOS host target):
+1. Edit `inventory.yaml` and set `macos-local.ansible_user` to your macOS username.
+2. Ensure your SSH public key is authorized for that user:
+   - Add it to `~/.ssh/authorized_keys` on the Mac
+   - Enable **Remote Login** (System Settings → General → Sharing → Remote Login)
+
 Pass through any extra `ansible-playbook` args:
 
 \`\`\`bash
