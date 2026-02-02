@@ -25,6 +25,17 @@ echo "Creating Ansible playbook project: $PROJECT_DIR"
 # Create directory structure
 mkdir -p "$PROJECT_DIR"/{playbooks,inventory,roles,collections,vars,vault,group_vars,host_vars,artifacts}
 
+# Create roles requirements (optional vendoring via ansible-galaxy)
+cat > "$PROJECT_DIR/roles/requirements.yaml" << 'EOF'
+---
+roles:
+  # Vendored roles can be installed into ./roles using ansible-galaxy.
+  # Example (git role source):
+  # - name: brew
+  #   src: git+ssh://git@github.com/moltimersmith/ansible-role-brew.git
+  #   version: main
+EOF
+
 # Create ansible.cfg
 cat > "$PROJECT_DIR/ansible.cfg" << 'EOF'
 [defaults]
@@ -160,6 +171,19 @@ mkdir -p .ssh-container
 # Avoid writing known_hosts inside the container.
 ANSIBLE_SSH_ARGS=${ANSIBLE_SSH_ARGS:-"-F /dev/null -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o IdentityFile=/home/nonroot/.ssh/id_ed25519 -o IdentitiesOnly=yes"}
 
+# Vendor roles (if roles/requirements.yaml exists)
+if [[ -f "roles/requirements.yaml" ]]; then
+  docker run --rm \
+    --entrypoint ansible-galaxy \
+    -v "$(pwd):/ansible" \
+    -w /ansible \
+    -e GIT_SSH_COMMAND='ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o IdentitiesOnly=yes -o IdentityFile=/home/nonroot/.ssh/id_ed25519' \
+    -v "$(pwd)/.ssh-container:/home/nonroot/.ssh" \
+    -v "$SSH_KEY:/home/nonroot/.ssh/id_ed25519:ro" \
+    "$IMAGE" \
+    role install -r roles/requirements.yaml -p roles/
+fi
+
 exec docker run --rm -it \
   --entrypoint ansible-playbook \
   -e ANSIBLE_SSH_ARGS="$ANSIBLE_SSH_ARGS" \
@@ -192,7 +216,7 @@ ${PROJECT_DIR}/
 ├── run-playbook.sh       # Helper to run via Docker
 ├── playbooks/           # Playbook files
 │   └── main.yaml        # Main playbook
-├── roles/               # Custom roles
+├── roles/               # Roles (vendored via roles/requirements.yaml)
 ├── collections/         # Custom collections
 ├── vars/                # Variable files
 ├── vault/               # Encrypted files
@@ -202,6 +226,10 @@ ${PROJECT_DIR}/
 \`\`\`
 
 ## Usage
+
+### Vendored roles (optional)
+
+If you add role dependencies to `roles/requirements.yaml`, the helper script will automatically vendor them into `./roles/` using `ansible-galaxy`.
 
 ### Run the main playbook (recommended)
 
