@@ -36,7 +36,7 @@ result_format = yaml
 bin_ansible_callbacks = False
 become = False
 roles_path = ./roles
-collections_path = ./collections
+collections_paths = ./collections
 remote_tmp = $HOME/.ansible/tmp
 local_tmp  = $HOME/.ansible/tmp
 
