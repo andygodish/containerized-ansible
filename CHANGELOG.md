@@ -1,3 +1,7 @@
+## 2.20.2-2 - 2026-02-02
+
+- [62beee7](https://github.com/andygodish/containerized-ansible/-/commit/62beee7fdb190bb730bdcaf5d4c6f2c7ce8bac5d) docs: explain upver-based versioning and release flow (#54)
+
 ## 2.20.2-1 - 2026-02-01
 
 - [12faf5b](https://github.com/andygodish/containerized-ansible/-/commit/12faf5bc267a6e1f751fa41f408f6212a79bcdcd) Docs: running playbooks against macOS host via SSH (#50)
