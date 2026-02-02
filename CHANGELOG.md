@@ -1,3 +1,8 @@
+## 2.20.2-3 - 2026-02-02
+
+- [10a8891](https://github.com/andygodish/containerized-ansible/-/commit/10a88915083c7035f21b52924321f301a43916a7) bootstrap: add ansible-galaxy role vendoring via roles/requirements.yaml (#57)
+- [4175e2f](https://github.com/andygodish/containerized-ansible/-/commit/4175e2fc167973b76445e4f115e9ba8edce7d612) bootstrap: prevent README template expansion during init (#55)
+
 ## 2.20.2-2 - 2026-02-02
 
 - [62beee7](https://github.com/andygodish/containerized-ansible/-/commit/62beee7fdb190bb730bdcaf5d4c6f2c7ce8bac5d) docs: explain upver-based versioning and release flow (#54)
