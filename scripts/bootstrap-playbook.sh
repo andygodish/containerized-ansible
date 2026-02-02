@@ -383,7 +383,7 @@ EOF
 # Create requirements.yaml for collections
 cat > "$PROJECT_DIR/collections/requirements.yaml" << 'EOF'
 ---
-collections:
+collections: []
   # Example collections
   # - name: community.general
   #   version: ">=1.0.0"
