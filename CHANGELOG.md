@@ -1,3 +1,8 @@
+## 2.20.3-0 - 2026-03-23
+
+- [e067a0b](https://github.com/andygodish/containerized-ansible/-/commit/e067a0b34748ec57af47134dfa246eefbf1f1a53) chore(deps): update dependency ansible-core to v2.20.3 (#59)
+- [d0dc686](https://github.com/andygodish/containerized-ansible/-/commit/d0dc686455d7b71a419ceb6407d721e8f9ede47f) chore(deps): Update github-actions (#60)
+
 ## 2.20.2-3 - 2026-02-02
 
 - [10a8891](https://github.com/andygodish/containerized-ansible/-/commit/10a88915083c7035f21b52924321f301a43916a7) bootstrap: add ansible-galaxy role vendoring via roles/requirements.yaml (#57)
