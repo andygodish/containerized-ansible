@@ -58,6 +58,20 @@ pipelining = True
 control_path = /tmp/ansible-ssh-%%h-%%p-%%r
 EOF
 
+# Create ansible-lint config
+# Keep linting focused on playbook repo content (not vendored roles/collections).
+cat > "$PROJECT_DIR/.ansible-lint" << 'EOF'
+---
+profile: basic
+
+exclude_paths:
+  - roles/
+  - collections/
+  - artifacts/
+  - .ssh-container/
+  - .git/
+EOF
+
 # Create inventory.yaml template
 # NOTE: when running playbooks from inside Docker on macOS, the host is reachable at host.docker.internal
 cat > "$PROJECT_DIR/inventory.yaml" << 'EOF'
@@ -383,7 +397,7 @@ EOF
 # Create requirements.yaml for collections
 cat > "$PROJECT_DIR/collections/requirements.yaml" << 'EOF'
 ---
-collections:
+collections: []
   # Example collections
   # - name: community.general
   #   version: ">=1.0.0"
