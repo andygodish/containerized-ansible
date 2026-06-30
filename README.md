@@ -86,6 +86,10 @@ docker run --rm \
 
 ---
 
+## Convenience Scripts
+
+- `./scripts/run-lint.sh` — run `ansible-lint` inside the containerized-ansible image against the current repo (or specified paths).
+
 ## Convenience Functions
 
 To make working with containerized Ansible easier, source the provided aliases:
