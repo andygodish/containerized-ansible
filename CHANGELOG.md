@@ -1,3 +1,9 @@
+## 2.21.1-0 - 2026-06-30
+
+- [b0fb0c8](https://github.com/andygodish/containerized-ansible/-/commit/b0fb0c829e67216d44393dccdd9d5295ea384e64) chore(deps): update ansible-core to v2.21.1 (#62)
+- [504025f](https://github.com/andygodish/containerized-ansible/-/commit/504025fab5c8b0c3bc7179a8c43e4fd51e47b9d2) chore: add run-lint.sh helper (#58)
+- [4192ed8](https://github.com/andygodish/containerized-ansible/-/commit/4192ed8267d0caeb71f78ee83f747f85dd6e4a2e) chore(deps): Update github-actions to v7 (#63)
+
 ## 2.20.3-0 - 2026-03-23
 
 - [e067a0b](https://github.com/andygodish/containerized-ansible/-/commit/e067a0b34748ec57af47134dfa246eefbf1f1a53) chore(deps): update dependency ansible-core to v2.20.3 (#59)
